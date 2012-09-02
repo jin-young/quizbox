@@ -95,21 +95,7 @@ public class CityElimination {
     public int minCost(List<City> cities, List<Load> loads) {
         if(loads.size() == 0) return 0;
         if(cities.size() == 0 && loads.size() > 0) return Integer.MAX_VALUE;
-        
-        /*
-        List<Integer> cityIds = new LinkedList<Integer>();
-        for(City c : cities) { cityIds.add(c.id()); }
-        
-        //cache hit?
-        if(cache.get(cityIds) != null) {
-            System.out.print(cityIds);
-            System.out.print(" HIT. RETURN ");
-            System.out.println();
-            return cache.get(cityIds);
-        }
-        */
 
-        //no hit
         City candiateCity = cities.remove(0);
         
         List<Load> remaindLoads = new LinkedList<Load>();
@@ -119,18 +105,10 @@ public class CityElimination {
         
         List<City> remainedCities = new LinkedList<City>();
         for(City city: cities) remainedCities.add(city);
-        
-        int costElemination = candiateCity.eliminationCost() + minCost(remainedCities, remaindLoads);
+     
+        int eleminationSubCost = minCost(remainedCities, remaindLoads);
+        int costElemination = (eleminationSubCost == Integer.MAX_VALUE) ? Integer.MAX_VALUE : candiateCity.eliminationCost() + eleminationSubCost;
         int costSkip = minCost(cities, loads);
-        
-        /*
-        cache.put(cityIds, Math.min(costElemination, costSkip));
-        System.out.print(cityIds);
-        System.out.print(" PUT ");
-        System.out.println(cache.get(cityIds));
-        
-        return cache.get(cityIds);
-        */
         
         return Math.min(costElemination, costSkip);
     }
