@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,10 +15,41 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+class Pair {
+    private List<Integer> cityIds;
+    private String loads;
+    
+    public Pair(List<Integer> cityIds, String loads) {
+        this.cityIds = cityIds;
+        this.loads = loads;
+    }
+    
+    public boolean equals(Object o) {
+        Pair t = (Pair)o;
+        return this.cityIds.equals(t.getCityIds()) && loads.equals(t.getLoads());
+    }
+    
+    public List<Integer> getCityIds() {
+        return this.cityIds;
+    }
+    
+    public String getLoads() {
+        return this.loads;
+    }
+    
+    public int hashCode() {
+        String temp = "";
+        for(int value: this.cityIds) {
+            temp += Integer.toString(value);
+        }
+        temp += this.loads;
+        return temp.hashCode();
+    }
+}
 public class CityElimination {
     private Map<Integer, City> cities = new HashMap<Integer, City>();
     private List<Load> loads = new LinkedList<Load>();
-    private Map<List<Integer>, Integer> cache = new HashMap<List<Integer>, Integer>();
+    private Map<Pair, Integer> cache = new HashMap<Pair, Integer>();
     
     public Map<Integer, City> getCities() {
         return this.cities;
@@ -88,14 +122,44 @@ public class CityElimination {
                 if(!cities.contains(load.cityV())) cities.add(load.cityV());
             }
             
-            System.out.println(elemination.minCost(cities, elemination.getLoads()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z");
+            System.out.println("Start: " + sdf.format(Calendar.getInstance().getTime()));
+            System.out.println(elemination.minCostTryDynamic(cities, elemination.getLoads()));
+            System.out.println("End: " + sdf.format(Calendar.getInstance().getTime()));
         }
     }
     
-    public int minCost(List<City> cities, List<Load> loads) {
+    public int minCostTryDynamic(List<City> cities, List<Load> loads) {
         if(loads.size() == 0) return 0;
         if(cities.size() == 0 && loads.size() > 0) return Integer.MAX_VALUE;
 
+        List<Integer> cityIds = new LinkedList<Integer>();
+        for(City c: cities) cityIds.add(c.id());
+        
+        String loadString = "";
+        for(Load l: loads) loadString += l.cityU().id() + "-" + l.cityV().id() + ",";
+        
+        Pair key = new Pair(cityIds, loadString);
+        if(cache.get(key) != null) {
+            /*
+            if(cache.get(key) != Integer.MAX_VALUE){
+            System.out.print("HIT : ");
+            System.out.print(key.getCityIds());
+            System.out.print(" / ");
+            System.out.print(key.getLoads());
+            System.out.println(". Value: " + cache.get(key));
+            }
+            */
+            return cache.get(key);
+        } else {
+            /*
+            System.out.print("MISS : ");
+            System.out.print(key.getCityIds());
+            System.out.print(" / ");
+            System.out.println(key.getLoads());
+            */
+        }
+        
         City candiateCity = cities.remove(0);
         
         List<Load> remaindLoads = new LinkedList<Load>();
@@ -105,12 +169,14 @@ public class CityElimination {
         
         List<City> remainedCities = new LinkedList<City>();
         for(City city: cities) remainedCities.add(city);
-     
-        int eleminationSubCost = minCost(remainedCities, remaindLoads);
-        int costElemination = (eleminationSubCost == Integer.MAX_VALUE) ? Integer.MAX_VALUE : candiateCity.eliminationCost() + eleminationSubCost;
-        int costSkip = minCost(cities, loads);
         
-        return Math.min(costElemination, costSkip);
+        int eleminationSubCost = minCostTryDynamic(remainedCities, remaindLoads);
+        int costElemination = (eleminationSubCost == Integer.MAX_VALUE) ? Integer.MAX_VALUE : candiateCity.eliminationCost() + eleminationSubCost;
+        int minCost = Math.min(costElemination, minCostTryDynamic(cities, loads));
+        
+        cache.put(key, minCost);
+        
+        return minCost;
     }
     
     public int minCostBrute(List<Load> loads) {
