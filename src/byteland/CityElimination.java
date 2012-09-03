@@ -38,7 +38,8 @@ public class CityElimination {
         City candiateCity = cities.remove(0);
         
         //First of all, let assume that removing first city in city list is optimal solution.
-        //Then optimal value would be elimination of of the city and minCost(remainedCities, remainedLoads)
+        //Then optimal solution would be elimination cost of of the selected city and 
+        //minCost(remainedCities, remainedLoads)
         List<City> remainedCities = new LinkedList<City>(cities);
         List<Load> remaindLoads = new LinkedList<Load>();
         for(Load l : loads) {
@@ -52,15 +53,15 @@ public class CityElimination {
         
         //Second, let assume that keeping the first city in city list is optimal solution.
         //Then, since we only deal with loads which have different troop type at the each end,
-        //we should remove a city at the another side of the first city in a load. Of course,
-        //all loads which is connected to the city also should be removed.
+        //we should remove cities which are connected to the first city. 
+        //All loads which is connected to the cities also should be removed.
         List<City> connectedCities = new LinkedList<City>();
         List<Load> loadsFromConnectedCities = new LinkedList<Load>();
         
         int anotherSideElimiationCost = 0;
         for(Load l : candiateCity.loads()) {
             City city = (candiateCity == l.cityU()) ? l.cityV() : l.cityU();
-            if(cities.contains(city)) {
+            if(cities.contains(city)) { //connected city could be removed already, so check it first
                 connectedCities.add(city);
                 anotherSideElimiationCost += city.eliminationCost();
                 loadsFromConnectedCities.addAll(city.loads());
@@ -76,9 +77,7 @@ public class CityElimination {
         
         int noEliminationCost = anotherSideElimiationCost + minCost(remainedCities, remaindLoads);
         
-        int minCost = Math.min(costElemination, noEliminationCost);
-        
-        return minCost;
+        return Math.min(costElemination, noEliminationCost);
     }
     
     public int minCostBrute(List<Load> loads) {
