@@ -55,7 +55,7 @@ public class Run {
     public static void main(String[] args) {
         List<CityElimination> cases = buildGraph(args[0]);
         for (CityElimination elimination : cases) {
-            //elimination.setEnableCache(true);
+            //elimination.setEnableCache(false);
             long start = Calendar.getInstance().getTimeInMillis();
             System.out.println(elimination.minCost());
             System.out.println((Calendar.getInstance().getTimeInMillis() - start)/1000f + " sec");

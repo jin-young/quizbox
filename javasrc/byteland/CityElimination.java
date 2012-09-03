@@ -1,26 +1,24 @@
 package byteland;
 
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class CityElimination {
     private Map<Integer, City> cities = new HashMap<Integer, City>();
     private List<Load> loads = new LinkedList<Load>();
-    private Map<Entry<List<City>,List<Load>>, Integer> cache = new HashMap<Entry<List<City>,List<Load>>, Integer>();
-    private boolean enableCache = false;
+    private Map<List<City>, Integer> cache = new HashMap<List<City>, Integer>();
+    private boolean enableCache = true;
     
     public void setEnableCache(boolean enableCache) {
         this.enableCache = enableCache;
     }
 
-    public Map<Integer, City> getCities() {
-        return this.cities;
+    public List<City> getCities() {
+        return new LinkedList<City>(this.cities.values());
     }
     
     public List<Load> getLoads() {
@@ -40,15 +38,14 @@ public class CityElimination {
     }
     
     public int minCost() {
-        return minCost(new LinkedList<City>(this.cities.values()), this.loads);
+        return minCost(getCities(), this.loads);
     }
     
     public int minCost(List<City> cities, List<Load> loads) {
         if(loads.size() == 0) return 0;
         
-        Map.Entry<List<City>,List<Load>> key = null;
+        List<City> key = new LinkedList<City>(cities);
         if(enableCache) {
-            key = new AbstractMap.SimpleEntry<List<City>,List<Load>>(cities, loads);
             if(cache.containsKey(key)) return cache.get(key);
         }
         

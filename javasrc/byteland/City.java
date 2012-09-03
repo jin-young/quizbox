@@ -3,7 +3,7 @@ package byteland;
 import java.util.LinkedList;
 import java.util.List;
 
-public class City implements Comparable<City> {
+public class City {
     private int id;
     private String troopsType;
     private int cost;
@@ -34,12 +34,5 @@ public class City implements Comparable<City> {
     
     public List<Load> loads() {
         return this.connectedLoads;
-    }
-
-    @Override
-    public int compareTo(City c) {
-        if(this.id < c.id()) return -1;
-        else if(this.id > c.id()) return 1;
-        return 0;
     }
 }
