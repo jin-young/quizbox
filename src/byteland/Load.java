@@ -1,12 +1,20 @@
 package byteland;
 
-public class Load {
+public class Load implements Comparable<Load> {
     private City u;
     private City v;
+    public int getId() {
+        return id;
+    }
+
+    private int id;
     
-    public Load(City u, City v) {
+    public Load(int id, City u, City v) {
+        this.id = id;
         this.u = u;
         this.v = v;
+        u.addLoad(this);
+        v.addLoad(this);
     }
     
     public City cityU() {
@@ -23,5 +31,12 @@ public class Load {
     
     public boolean isConnectDiffType() {
         return !u.troopsType().equals(v.troopsType());
+    }
+
+    @Override
+    public int compareTo(Load l) {
+        if(this.id < l.getId()) return -1;
+        else if(this.id > l.getId()) return 1;
+        return 0;
     }
 }
