@@ -1,16 +1,24 @@
 package byteland;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class CityElimination {
     private Map<Integer, City> cities = new HashMap<Integer, City>();
     private List<Load> loads = new LinkedList<Load>();
+    private Map<Entry<List<City>,List<Load>>, Integer> cache = new HashMap<Entry<List<City>,List<Load>>, Integer>();
+    private boolean enableCache = false;
     
+    public void setEnableCache(boolean enableCache) {
+        this.enableCache = enableCache;
+    }
+
     public Map<Integer, City> getCities() {
         return this.cities;
     }
@@ -31,15 +39,24 @@ public class CityElimination {
         }
     }
     
-    //But wrong approach.....
+    public int minCost() {
+        return minCost(new LinkedList<City>(this.cities.values()), this.loads);
+    }
+    
     public int minCost(List<City> cities, List<Load> loads) {
         if(loads.size() == 0) return 0;
+        
+        Map.Entry<List<City>,List<Load>> key = null;
+        if(enableCache) {
+            key = new AbstractMap.SimpleEntry<List<City>,List<Load>>(cities, loads);
+            if(cache.containsKey(key)) return cache.get(key);
+        }
         
         City candiateCity = cities.remove(0);
         
         //First of all, let assume that removing first city in city list is optimal solution.
-        //Then optimal solution would be elimination cost of of the selected city and 
-        //minCost(remainedCities, remainedLoads)
+        //Then optimal value would be sum of the selected city's elimination cost and 
+        //sub-optimal value minCost(remainedCities, remainedLoads).
         List<City> remainedCities = new LinkedList<City>(cities);
         List<Load> remaindLoads = new LinkedList<Load>();
         for(Load l : loads) {
@@ -76,6 +93,8 @@ public class CityElimination {
         }
         
         int noEliminationCost = anotherSideElimiationCost + minCost(remainedCities, remaindLoads);
+        
+        if(enableCache) cache.put(key, Math.min(costElemination, noEliminationCost));
         
         return Math.min(costElemination, noEliminationCost);
     }

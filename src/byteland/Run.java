@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -54,14 +55,10 @@ public class Run {
     public static void main(String[] args) {
         List<CityElimination> cases = buildGraph(args[0]);
         for (CityElimination elimination : cases) {
-            
-            List<City> cities = new LinkedList<City>();
-            for(Load load : elimination.getLoads()) {
-                if(!cities.contains(load.cityU())) cities.add(load.cityU());
-                if(!cities.contains(load.cityV())) cities.add(load.cityV());
-            }
-            
-            System.out.println(elimination.minCost(cities, elimination.getLoads()));
+            //elimination.setEnableCache(true);
+            long start = Calendar.getInstance().getTimeInMillis();
+            System.out.println(elimination.minCost());
+            System.out.println((Calendar.getInstance().getTimeInMillis() - start)/1000f + " sec");
         }
     }
 
